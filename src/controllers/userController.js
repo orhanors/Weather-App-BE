@@ -23,7 +23,7 @@ exports.refreshTokenHandler = async (req, res, next) => {
 		res.send("OK");
 	} catch (error) {
 		console.log("Refresh token error", error);
-		next(new ApiError(403, error.message));
+		next(error);
 	}
 };
 
@@ -68,7 +68,7 @@ exports.removeFavoriteCity = async (req, res, next) => {
 
 		removeItem(user.favoriteCities, cityName);
 		await user.save();
-		res.send("Ok");
+		res.status(200).send(user);
 	} catch (error) {
 		console.log("fav delete error", error);
 		next(error);
