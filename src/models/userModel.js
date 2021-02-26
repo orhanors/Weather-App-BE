@@ -15,7 +15,7 @@ const UserSchema = new Schema({
 	googleId: { type: String },
 	facebookId: { type: String },
 	refreshTokens: [{ token: String }],
-	favoriteCities: [{ type: Object }],
+	favoriteCities: [{ type: String }],
 });
 
 UserSchema.methods.toJSON = function () {

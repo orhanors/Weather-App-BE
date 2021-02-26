@@ -6,6 +6,8 @@ const {
 	getMeProfile,
 	refreshTokenHandler,
 	logout,
+	addFavoriteCity,
+	removeFavoriteCity,
 } = require("../../controllers/userController");
 
 userRoute.get("/me", validateToken, getMeProfile);
@@ -32,15 +34,8 @@ userRoute.get(
 	handleTokens
 );
 
-//SPOTIFY
-userRoute.get(
-	"/spotifyLogin",
-	passport.authenticate("spotify", { scope: ["user-read-email"] })
-);
+//Favorite weathers
+userRoute.get("/favorites/:cityName", validateToken, addFavoriteCity);
+userRoute.delete("/favorites/:cityName", validateToken, removeFavoriteCity);
 
-userRoute.get(
-	"/spotifyRedirect",
-	passport.authenticate("spotify"),
-	handleTokens
-);
 module.exports = userRoute;

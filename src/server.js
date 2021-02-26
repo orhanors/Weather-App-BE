@@ -12,7 +12,7 @@ const {
 	unauthorizedError,
 } = require("./middlewares/errorHandling");
 const passport = require("passport");
-const oauth = require("./middlewares/oauth");
+require("./middlewares/oauth");
 const cookieParser = require("cookie-parser");
 const server = express();
 
@@ -43,8 +43,8 @@ const corsOptions = {
 //SETTING UP MIDDLEWARES
 server.use(cors(corsOptions));
 server.use(express.json());
-server.use(passport.initialize());
 server.use(cookieParser());
+server.use(passport.initialize());
 
 //ROUTES
 server.use("/api", services);

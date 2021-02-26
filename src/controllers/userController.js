@@ -1,8 +1,10 @@
 const UserModel = require("../models/userModel");
-const { handleRefreshToken } = require("../utils/jwt");
+const { removeItem } = require("../utils/arrayUtils");
+const { handleRefreshToken, verifyJWT } = require("../utils/jwt");
+const ApiError = require("../utils/ApiError");
 exports.getMeProfile = async (req, res, next) => {
 	try {
-		res.status(201).json({ data: req.user });
+		res.status(201).send(req.user);
 	} catch (error) {
 		console.log("profile get me error", error);
 		next(error);
@@ -12,6 +14,7 @@ exports.getMeProfile = async (req, res, next) => {
 exports.refreshTokenHandler = async (req, res, next) => {
 	try {
 		const oldRefreshToken = req.cookies.refreshToken;
+		console.log("cookies are: ", req.cookies);
 		if (!oldRefreshToken)
 			throw new ApiError(400, "Refresh token is missing");
 		const newTokens = await handleRefreshToken(oldRefreshToken);
@@ -35,6 +38,39 @@ exports.logout = async (req, res, next) => {
 		res.send("OK");
 	} catch (error) {
 		console.log("logout error: ", error);
+		next(error);
+	}
+};
+
+exports.addFavoriteCity = async (req, res, next) => {
+	try {
+		const token = req.cookies.token;
+		const { cityName } = req.params;
+		const { _id } = await verifyJWT(token);
+
+		const user = await UserModel.findById(_id);
+		user.favoriteCities.push(cityName);
+		await user.save();
+		res.status(200).send(user);
+	} catch (error) {
+		console.log(error);
+		next(error);
+	}
+};
+
+exports.removeFavoriteCity = async (req, res, next) => {
+	try {
+		const token = req.cookies.token;
+		const { cityName } = req.params;
+		const { _id } = await verifyJWT(token);
+
+		const user = await UserModel.findById(_id);
+
+		removeItem(user.favoriteCities, cityName);
+		await user.save();
+		res.send("Ok");
+	} catch (error) {
+		console.log("fav delete error", error);
 		next(error);
 	}
 };
