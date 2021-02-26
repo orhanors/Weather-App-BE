@@ -14,12 +14,13 @@ exports.getMeProfile = async (req, res, next) => {
 exports.refreshTokenHandler = async (req, res, next) => {
 	try {
 		const oldRefreshToken = req.cookies.refreshToken;
-		console.log("cookies are: ", req.cookies);
+		console.log("old token is:", oldRefreshToken);
 		if (!oldRefreshToken)
 			throw new ApiError(400, "Refresh token is missing");
 		const newTokens = await handleRefreshToken(oldRefreshToken);
-		res.cookies("token", newTokens.token);
-		res.cookies("refreshToken", newTokens.refreshToken);
+		console.log("new token is: ", newTokens.token);
+		res.cookie("token", newTokens.token);
+		res.cookie("refreshToken", newTokens.refreshToken);
 		res.send("OK");
 	} catch (error) {
 		console.log("Refresh token error", error);

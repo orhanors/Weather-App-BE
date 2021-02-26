@@ -28,17 +28,18 @@ const handleRefreshToken = async (oldRefreshToken) => {
 	const user = await UserModel.findOne({ _id: decoded._id });
 
 	if (!user) throw new ApiError(403, "Access is forbidden");
-
+	console.log("user.refreshtokens: ", user.refreshTokens);
 	const currentRefreshToken = user.refreshTokens.find(
 		(t) => t.token === oldRefreshToken
 	);
+	console.log("current token is: ", currentRefreshToken);
 	if (!currentRefreshToken)
 		throw new ApiError(403, "Refresh token is missing or invalid");
 
 	const newAccessToken = await generateJWT({ _id: user._id });
 	const newRefreshToken = await generateRefreshJWT({ _id: user._id });
 
-	currentRefreshToken.token = newRefreshToken;
+	user.refreshTokens.push({ token: newRefreshToken });
 	await user.save();
 
 	return { token: newAccessToken, refreshToken: newRefreshToken };
@@ -46,7 +47,7 @@ const handleRefreshToken = async (oldRefreshToken) => {
 
 const generateJWT = (payload) =>
 	new Promise((res, rej) => {
-		jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" }, (err, token) => {
+		jwt.sign(payload, JWT_SECRET, { expiresIn: "10000" }, (err, token) => {
 			if (err) rej(err);
 			res(token);
 		});
